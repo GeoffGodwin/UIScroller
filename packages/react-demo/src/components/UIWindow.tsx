@@ -117,10 +117,18 @@ class UIWindow extends React.Component<
     const spacer = Math.max(0, raw);
     const scrollable = raw <= UIWindow.EPS;
 
+    // Only allow showJump to be true if not batchActive or pinActive
+    let showJump = this.state.showJump;
+    if (!scrollable) {
+      showJump = false;
+    } else if (this.batchActive || this.pinActive) {
+      showJump = false;
+    }
+
     this.setState({
       spacerPx: spacer,
       scrollable,
-      showJump: scrollable ? this.state.showJump : false,
+      showJump,
     });
   }
 
@@ -210,7 +218,7 @@ class UIWindow extends React.Component<
   private onScroll = () => {
     const el = this.containerRef.current;
     if (!el) return;
-    if (this.pinActive) return; // ignore while pinned
+    if (this.pinActive || this.batchActive) return; // ignore while pinned or batching
     const nearBottom = this.isAtBottom(el);
     const showJump = this.state.scrollable && !nearBottom;
     if (showJump !== this.state.showJump) this.setState({ showJump }, this.updateJumpBtnPosition);
@@ -235,28 +243,39 @@ class UIWindow extends React.Component<
 
   // Called by OuterEntry on mount with its target height
   private onExpandBegin = (id: number, height: number) => {
-  this.heights.set(id, height);
+    this.heights.set(id, height);
 
-  if (!this.batchActive) {
-    this.batchActive = true;
+    if (!this.batchActive) {
+      this.batchActive = true;
 
-    // Block entries until pre-scroll completes.
-    this.closeGate();
+      // Block entries until pre-scroll completes.
+      this.closeGate();
 
-    // Smooth to bottom first, then pin, then open gate so items can animate.
-    this.scrollToBottomSmooth(260, () => {
-      this.startPin();
-      this.openGate();
-      // safety: if nothing animates, unpin soon
-      this.armUnpinFallback(1200);
-    });
-  }
+      // Hide jump button immediately before scrolling to bottom
+      if (this.state.showJump) {
+        this.setState({ showJump: false });
+        // setState is async, but we want to hide the button right away, so start scroll immediately
+        this.scrollToBottomSmooth(260, () => {
+          this.startPin();
+          this.openGate();
+          // safety: if nothing animates, unpin soon
+          this.armUnpinFallback(1200);
+        });
+      } else {
+        this.scrollToBottomSmooth(260, () => {
+          this.startPin();
+          this.openGate();
+          // safety: if nothing animates, unpin soon
+          this.armUnpinFallback(1200);
+        });
+      }
+    }
 
-  if (!this.animatingIds.has(id)) this.animatingIds.add(id);
+    if (!this.animatingIds.has(id)) this.animatingIds.add(id);
 
-  // Reflect incoming height into spacer immediately
-  this.recomputeSpacer();
-};
+    // Reflect incoming height into spacer immediately
+    this.recomputeSpacer();
+  };
 
   // Called by OuterEntry after its transition ends
   private onExpandEnd = (id: number) => {
