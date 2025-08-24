@@ -3,12 +3,13 @@ import { WindowContext } from "./WindowContext";
 
 class UIWindow extends React.Component<
   { children: React.ReactNode },
-  { spacerPx: number; scrollable: boolean; showJump: boolean }
+  { spacerPx: number; scrollable: boolean; showJump: boolean; jumpBtnTop?: number }
 > {
-  state = { spacerPx: 0, scrollable: false, showJump: false };
+  state = { spacerPx: 0, scrollable: false, showJump: false, jumpBtnTop: undefined as number | undefined };
 
   private containerRef = React.createRef<HTMLDivElement>();
   private heights = new Map<number, number>();      // id -> px
+  private jumpBtnRef = React.createRef<HTMLButtonElement>();
   private animatingIds = new Set<number>();         // ids currently animating
   private batchActive = false;
 
@@ -39,11 +40,13 @@ class UIWindow extends React.Component<
 
   componentDidMount() {
     this.recomputeSpacer();
+    this.updateJumpBtnPosition();
 
     const el = this.containerRef.current;
     if ('ResizeObserver' in window) {
       this.ro = new ResizeObserver(() => {
         this.recomputeSpacer();
+        this.updateJumpBtnPosition();
         if (this.pinActive) this.scrollToBottomInstant();
       });
       if (el) this.ro.observe(el);
@@ -55,6 +58,7 @@ class UIWindow extends React.Component<
       el.addEventListener('touchstart', cancel, { passive: true });
       el.addEventListener('pointerdown', cancel, { passive: true });
     }
+    window.addEventListener('resize', this.updateJumpBtnPosition);
   }
 
   componentWillUnmount() {
@@ -66,9 +70,19 @@ class UIWindow extends React.Component<
       el.removeEventListener('touchstart', this.cancelSmooth as any);
       el.removeEventListener('pointerdown', this.cancelSmooth as any);
     }
+    window.removeEventListener('resize', this.updateJumpBtnPosition);
     this.stopPin();
     this.cancelSmooth();
   }
+  private updateJumpBtnPosition = () => {
+    const container = this.containerRef.current;
+    const btn = this.jumpBtnRef.current;
+    if (container && btn) {
+      // The button should be 10px from the visible bottom of the scroll area, regardless of scroll position
+      const top = container.scrollTop + container.clientHeight - btn.offsetHeight - 10;
+      this.setState({ jumpBtnTop: top });
+    }
+  };
 
   /* ---------- utils ---------- */
 
@@ -189,7 +203,8 @@ class UIWindow extends React.Component<
     if (this.pinActive) return; // ignore while pinned
     const nearBottom = this.isAtBottom(el);
     const showJump = this.state.scrollable && !nearBottom;
-    if (showJump !== this.state.showJump) this.setState({ showJump });
+    if (showJump !== this.state.showJump) this.setState({ showJump }, this.updateJumpBtnPosition);
+    else this.updateJumpBtnPosition();
   };
 
   private onJumpClick = () => this.scrollToBottomSmooth(520);
@@ -258,7 +273,7 @@ class UIWindow extends React.Component<
   /* ---------- render ---------- */
 
   render() {
-    const { spacerPx, scrollable, showJump } = this.state;
+    const { spacerPx, scrollable, showJump, jumpBtnTop } = this.state;
 
     return (
       <div
@@ -282,9 +297,9 @@ class UIWindow extends React.Component<
             onExpandBegin: this.onExpandBegin,
             onExpandEnd: this.onExpandEnd,
             onUnmount: this.onUnmount,
-            waitToAnimate: this.waitToAnimate,   // <-- add this
+            waitToAnimate: this.waitToAnimate,
           }}
->
+        >
           {/* shrinking spacer */}
           <div
             style={{
@@ -293,36 +308,38 @@ class UIWindow extends React.Component<
               transition: 'height 250ms ease',
             }}
           />
-
+          {/* floating jump-to-bottom; doesn’t affect layout */}
+          <button
+            ref={this.jumpBtnRef}
+            onClick={this.onJumpClick}
+            style={{
+              position: 'absolute',
+              right: 12,
+              top: jumpBtnTop,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'white',
+              borderRadius: 999,
+              boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
+              zIndex: 3,
+              opacity: showJump ? 1 : 0,
+              transform: showJump ? 'translateY(0)' : 'translateY(-24px)',
+              transition: 'transform 200ms ease, opacity 200ms ease',
+              pointerEvents: showJump ? 'auto' : 'none',
+              height: showJump ? undefined : 0,
+              padding: showJump ? '8px 12px' : 0,
+              border: showJump ? '1px solid #e3e3e3' : 'none',
+              overflow: 'hidden',
+            }}
+          >
+            Jump to bottom
+          </button>
           {/* entries */}
           <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column' }}>
             {this.props.children}
           </div>
 
-          {/* floating jump-to-bottom; doesn’t affect layout */}
-          <button
-            onClick={this.onJumpClick}
-            style={{
-              position: 'sticky',
-              right: 12,
-              bottom: 12,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              border: '1px solid #e3e3e3',
-              background: 'white',
-              borderRadius: 999,
-              padding: '8px 12px',
-              boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
-              transform: showJump ? 'translateY(0)' : 'translateY(-24px)',
-              opacity: showJump ? 1 : 0,
-              transition: 'transform 200ms ease, opacity 200ms ease',
-              zIndex: 3,
-              pointerEvents: showJump ? 'auto' : 'none',
-            }}
-          >
-            Jump to bottom
-          </button>
         </WindowContext.Provider>
       </div>
     );
