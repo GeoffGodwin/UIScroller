@@ -4,8 +4,35 @@
  * - Now includes a CSS grid container to prove UIWindow responsiveness.
  */
 import React from 'react';
+import './demo.css';
 import UIWindow from './components/UIWindow';
 import InnerEntry from './components/InnerEntry';
+import ReactDOM from 'react-dom';
+// VariableHeightEntry: for testing variable height entries
+const VariableHeightEntry: React.FC<{ text: string }> = ({ text }) => {
+  // Randomize height between 30px and 400px on each mount
+  const [height] = React.useState(() => Math.floor(Math.random() * (400 - 30 + 1)) + 30);
+  return (
+    <div
+      style={{
+        display: 'block',
+        boxSizing: 'border-box',
+        padding: '12px 14px',
+        border: '1px solid #e3e3e3',
+        borderRadius: 12,
+        lineHeight: 1.35,
+        fontFamily:
+          'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial',
+        margin: 0,
+        height,
+        background: '#f9f9f9',
+        transition: 'height 0.2s',
+      }}
+    >
+      {text} <span style={{ color: '#aaa', fontSize: 12 }}>(height: {height}px)</span>
+    </div>
+  );
+};
 import OuterEntry from './components/OuterEntry';
 
 type DemoState = { items: number[]; nextId: number; n: number };
@@ -44,21 +71,13 @@ export class Demo extends React.Component<{}, DemoState> {
     const { items, n } = this.state;
 
     return (
-      <div style={{
-        padding: 16,
-        maxWidth: 900,
-        margin: '0 auto',
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: 32,
-        alignItems: 'start',
-      }}>
-        <div style={{ gridColumn: '1 / span 2', marginBottom: 12 }}>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <div className="page-layout">
+        <div className="header">
+          <div className="demo-controls">
             <button onClick={this.append}>Append one</button>
             <button onClick={this.deleteNFromEnd}>Delete last N</button>
             <button onClick={this.replaceNFromEndWithNew}>Replace last N with new</button>
-            <label style={{ marginLeft: 'auto' }}>
+            <label>
               N:&nbsp;
               <input
                 type="number"
@@ -70,20 +89,22 @@ export class Demo extends React.Component<{}, DemoState> {
             </label>
           </div>
         </div>
-        {/* UIWindow in a grid cell to prove responsiveness */}
-        <div style={{ minWidth: 0 }}>
+        <div className="left-sidebar">
+          Left Column
+        </div>
+        <div className="main">
           <UIWindow>
             {items.map((id) => (
               <OuterEntry key={id} id={id}>
-                <InnerEntry text={`Item #${id}`} />
+                <VariableHeightEntry text={`Item #${id}`} />
               </OuterEntry>
             ))}
           </UIWindow>
         </div>
-        {/* Placeholder for additional content to show grid flexibility */}
-        <div style={{ background: '#f3f3f3', borderRadius: 12, minHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: 18 }}>
-          <span>Other grid content</span>
+        <div className="right-sidebar">
+          Right Column
         </div>
+        <div className='footer'>Footer Content</div>
       </div>
     );
   }

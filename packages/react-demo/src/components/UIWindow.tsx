@@ -164,6 +164,7 @@ class UIWindow extends React.Component<
     const el = this.containerRef.current;
     const containerHeight = el?.clientHeight ?? 0;
     const entriesHeight = this.sumEntryHeights();
+    console.log('Entries height is calc to be',entriesHeight);
     const raw = containerHeight - entriesHeight;
     const spacer = Math.max(0, raw);
     const scrollable = raw <= UIWindow.EPSILON;
@@ -190,8 +191,9 @@ class UIWindow extends React.Component<
    */
   private isAtBottom(el?: HTMLElement | null) {
     if (!el) return true;
-    const max = el.scrollHeight - el.clientHeight;
-    return max - el.scrollTop <= UIWindow.EPSILON;
+    const max = Math.round(el.scrollHeight - el.clientHeight);
+    const scrollTop = Math.round(el.scrollTop);
+    return Math.abs(max - scrollTop) <= UIWindow.EPSILON;
   }
 
   /** Instantly scroll to bottom. */
@@ -387,13 +389,10 @@ class UIWindow extends React.Component<
       <div
         ref={this.containerRef}
         style={{
-          height: '60vh',
-          border: '1px solid #ddd',
-          borderRadius: 12,
+          height: '100%',
           boxSizing: 'border-box',
           padding: '0 12px',                 // no vertical padding; simpler math
           overflowY: scrollable ? 'auto' : 'hidden',
-          background: '#fafafa',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',              // for overlay button

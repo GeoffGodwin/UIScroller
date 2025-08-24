@@ -41,7 +41,7 @@ class OuterEntry extends React.Component<{
     outer.style.transition = 'height 250ms ease';
 
     // Measure content height
-    const target = Math.ceil(box.getBoundingClientRect().height);
+    const target = Math.round(box.getBoundingClientRect().height);
     this.lastHeight = target;
 
     // Synchronously inform UIWindow (closes the gate)
@@ -62,7 +62,7 @@ class OuterEntry extends React.Component<{
     // Listen for transition end to finalize animation
     const onEnd = (e: TransitionEvent) => {
       if (e.propertyName !== 'height') return;
-      const finalPx = Math.ceil(outer.getBoundingClientRect().height);
+    const finalPx = Math.round(outer.getBoundingClientRect().height);
       outer.style.transition = 'none';
       outer.style.height = `${finalPx}px`;
       void outer.offsetHeight;

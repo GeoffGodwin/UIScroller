@@ -36,6 +36,8 @@ Once published to npm, install UIScroller in your React project:
 npm install ui-scroller-react
 ```
 
+TypeScript type declarations are included automatically—no extra steps needed for autocompletion and type safety.
+
 Then import the components from the package:
 
 ```tsx
@@ -75,11 +77,25 @@ MIT
 ---
 
 *Contributions and suggestions are welcome!*
-## Publishing
 
-1. Update the `name` field in `packages/react-demo/package.json` to a unique npm package name (e.g., `ui-scroller-react`).
-2. Remove or set `private: false` in the package.json.
-3. Run `npm publish` from the `packages/react-demo` directory.
+## Build & Publishing (for contributors)
+
+1. Make sure all code is in `src/` and exported via `src/index.ts`.
+2. Run:
+
+	```bash
+	npm run build
+	```
+
+	This will generate both the production build and the TypeScript type declarations in `dist/`.
+
+3. To publish:
+
+	```bash
+	npm publish
+	```
+
+	(Make sure the `name` in `package.json` is unique and `private` is set to `false`.)
 
 ## License
 

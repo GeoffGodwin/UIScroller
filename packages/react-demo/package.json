@@ -1,13 +1,16 @@
 {
   "name": "ui-scroller-react",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": false,
   "description": "A smart, bottom-up animated scroll container for React UIs. Perfect for chat and messaging interfaces.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "vite",
-    "build": "vite build"
+  "build:types": "tsc --project tsconfig.build.json",
+  "build": "npm run build:types && vite build",
+  "release": "standard-version",
+  "postrelease": "npm publish"
   },
   "dependencies": {
     "react": "^19.1.1",
