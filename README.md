@@ -19,11 +19,12 @@ The included demo (`packages/react-demo`) shows:
 - Responsiveness inside a CSS grid
 
 ### Run the Demo
+Note: This was run using Node v22.16.0
 
 ```bash
 cd packages/react-demo
 npm install
-npm run dev
+npm start
 # Open the local URL (usually http://localhost:5173)
 ```
 
