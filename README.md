@@ -27,12 +27,19 @@ npm run dev
 # Open the local URL (usually http://localhost:5173)
 ```
 
-## Usage
+
+## Installation & Usage in Your App
+
+Once published to npm, install UIScroller in your React project:
+
+```bash
+npm install ui-scroller-react
+```
+
+Then import the components from the package:
 
 ```tsx
-import UIWindow from './components/UIWindow';
-import OuterEntry from './components/OuterEntry';
-import InnerEntry from './components/InnerEntry';
+import { UIWindow, OuterEntry, InnerEntry, WindowContext } from 'ui-scroller-react';
 
 <UIWindow>
 	{items.map((id) => (
@@ -41,6 +48,12 @@ import InnerEntry from './components/InnerEntry';
 		</OuterEntry>
 	))}
 </UIWindow>
+```
+
+If using from source (not yet published), you can import directly from the `src` folder:
+
+```tsx
+import { UIWindow, OuterEntry, InnerEntry, WindowContext } from './path/to/ui-scroller-react/src';
 ```
 
 ## How It Works
@@ -62,5 +75,12 @@ MIT
 ---
 
 *Contributions and suggestions are welcome!*
-# UIScroller
-Building a text animation style scroller to better learn StencilJS
+## Publishing
+
+1. Update the `name` field in `packages/react-demo/package.json` to a unique npm package name (e.g., `ui-scroller-react`).
+2. Remove or set `private: false` in the package.json.
+3. Run `npm publish` from the `packages/react-demo` directory.
+
+## License
+
+MIT

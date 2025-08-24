@@ -1,8 +1,10 @@
 {
-  "name": "react-demo",
-  "version": "0.0.1",
-  "private": true,
-  "description": "React demo for ui-scroller web component.",
+  "name": "ui-scroller-react",
+  "version": "0.1.0",
+  "private": false,
+  "description": "A smart, bottom-up animated scroll container for React UIs. Perfect for chat and messaging interfaces.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "vite",
     "build": "vite build"
