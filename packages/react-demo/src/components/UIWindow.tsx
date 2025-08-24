@@ -58,7 +58,7 @@ class UIWindow extends React.Component<
       el.addEventListener('touchstart', cancel, { passive: true });
       el.addEventListener('pointerdown', cancel, { passive: true });
     }
-    window.addEventListener('resize', this.updateJumpBtnPosition);
+    window.addEventListener('resize', this.handleResize);
   }
 
   componentWillUnmount() {
@@ -70,10 +70,20 @@ class UIWindow extends React.Component<
       el.removeEventListener('touchstart', this.cancelSmooth as any);
       el.removeEventListener('pointerdown', this.cancelSmooth as any);
     }
-    window.removeEventListener('resize', this.updateJumpBtnPosition);
+    window.removeEventListener('resize', this.handleResize);
     this.stopPin();
     this.cancelSmooth();
   }
+  // Handles window resize: updates jump button position and visibility
+  private handleResize = () => {
+    this.updateJumpBtnPosition();
+    const el = this.containerRef.current;
+    if (!el) return;
+    if (this.pinActive) return; // ignore while pinned
+    const nearBottom = this.isAtBottom(el);
+    const showJump = this.state.scrollable && !nearBottom;
+    if (showJump !== this.state.showJump) this.setState({ showJump });
+  };
   private updateJumpBtnPosition = () => {
     const container = this.containerRef.current;
     const btn = this.jumpBtnRef.current;
