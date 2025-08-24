@@ -129,10 +129,10 @@ class UIWindow extends React.Component<
   /** Position the jump-to-bottom button 10px from the visible bottom */
   private updateJumpBtnPosition = () => {
     const container = this.containerRef.current;
-  const btn = this.jumpButtonRef.current;
+    const btn = this.jumpButtonRef.current;
     if (container && btn) {
       // The button should be 10px from the visible bottom of the scroll area, regardless of scroll position
-      const top = container.scrollTop + container.clientHeight - btn.offsetHeight - 10;
+      const top = Math.round(container.scrollTop + container.clientHeight - btn.offsetHeight - 10);
       this.setState({ jumpBtnTop: top });
     }
   };
@@ -162,12 +162,12 @@ class UIWindow extends React.Component<
    */
   private recomputeSpacer() {
     const el = this.containerRef.current;
-    const containerHeight = el?.clientHeight ?? 0;
-    const entriesHeight = this.sumEntryHeights();
-    console.log('Entries height is calc to be',entriesHeight);
-    const raw = containerHeight - entriesHeight;
-    const spacer = Math.max(0, raw);
-    const scrollable = raw <= UIWindow.EPSILON;
+  const containerHeight = Math.round(el?.clientHeight ?? 0);
+  const entriesHeight = Math.round(this.sumEntryHeights());
+  // console.log('Entries height is calc to be', entriesHeight);
+  const raw = containerHeight - entriesHeight;
+  const spacer = Math.max(0, Math.round(raw));
+  const scrollable = raw <= UIWindow.EPSILON;
 
     // Only allow showJump to be true if not batchActive or pinActive
     let showJump = this.state.showJump;
@@ -200,7 +200,7 @@ class UIWindow extends React.Component<
   private scrollToBottomInstant() {
     const el = this.containerRef.current;
     if (!el) return;
-    el.scrollTop = Math.max(0, el.scrollHeight - el.clientHeight);
+  el.scrollTop = Math.max(0, Math.round(el.scrollHeight - el.clientHeight));
   }
 
   /** Stores the original scroll-behavior style for restoration. */
@@ -223,9 +223,9 @@ class UIWindow extends React.Component<
 
     this.cancelSmooth();
 
-    const start = el.scrollTop;
-    const end = Math.max(0, el.scrollHeight - el.clientHeight);
-    const dist = end - start;
+  const start = Math.round(el.scrollTop);
+  const end = Math.max(0, Math.round(el.scrollHeight - el.clientHeight));
+  const dist = end - start;
     if (dist <= 0) { onDone?.(); return; }
 
     let rafId: number | null = null;
