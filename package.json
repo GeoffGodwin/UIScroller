@@ -1,0 +1,11 @@
+{
+  "name": "ui-scroller-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/react-demo"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/react-demo",
+    "serve": "npm run build && npm run start -w packages/react-demo"
+  }
+}
