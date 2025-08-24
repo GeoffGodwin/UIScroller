@@ -306,7 +306,7 @@ class UIWindow extends React.Component<
               position: 'sticky',
               right: 12,
               bottom: 12,
-              display: showJump ? 'inline-flex' : 'none',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
               border: '1px solid #e3e3e3',
@@ -314,10 +314,11 @@ class UIWindow extends React.Component<
               borderRadius: 999,
               padding: '8px 12px',
               boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
-              transform: showJump ? 'translateY(0)' : 'translateY(24px)',
+              transform: showJump ? 'translateY(0)' : 'translateY(-24px)',
               opacity: showJump ? 1 : 0,
               transition: 'transform 200ms ease, opacity 200ms ease',
               zIndex: 3,
+              pointerEvents: showJump ? 'auto' : 'none',
             }}
           >
             Jump to bottom
