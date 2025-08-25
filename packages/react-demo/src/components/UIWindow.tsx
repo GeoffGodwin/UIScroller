@@ -434,9 +434,9 @@ class UIWindow extends React.Component<
               transform: showJump ? 'translateY(0)' : 'translateY(-24px)',
               transition: 'transform 200ms ease, opacity 200ms ease',
               pointerEvents: showJump ? 'auto' : 'none',
-              height: showJump ? undefined : 0,
-              padding: showJump ? '8px 12px' : 0,
-              border: showJump ? '1px solid #e3e3e3' : 'none',
+              height: 'auto',
+              padding: '8px 12px',
+              border: '1px solid #e3e3e3',
               overflow: 'hidden',
               cursor: 'pointer'
             }}
