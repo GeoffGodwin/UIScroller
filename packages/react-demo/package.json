@@ -1,6 +1,6 @@
 {
   "name": "ui-scroller-react",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": false,
   "description": "A smart, bottom-up animated scroll container for React UIs. Perfect for chat and messaging interfaces.",
   "main": "dist/index.js",

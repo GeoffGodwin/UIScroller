@@ -27,6 +27,7 @@ class OuterEntry extends React.Component<{
   private measureRef = React.createRef<HTMLDivElement>();
   private lastHeight = 0;
   private onEnd?: (e: TransitionEvent) => void;
+  private resizeObserver?: ResizeObserver;
 
   componentDidMount() {
     const outer = this.outerRef.current!;
@@ -72,6 +73,18 @@ class OuterEntry extends React.Component<{
       outer.removeEventListener('transitionend', onEnd);
     };
     outer.addEventListener('transitionend', onEnd);
+
+    // Setup a resizeObserver since we have to assume entry contents could change size.
+    this.resizeObserver = new ResizeObserver(() => {
+      const newHeight = Math.ceil(box.getBoundingClientRect().height);
+      if (newHeight !== this.lastHeight){
+        this.lastHeight = newHeight;
+        outer.style.height = `${newHeight}px`;
+        this.context?.onExpandEnd(this.props.id, newHeight);
+      }
+      
+    });
+    this.resizeObserver.observe(this.measureRef.current!);
   }
 
   componentWillUnmount() {
